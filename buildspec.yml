@@ -1,0 +1,23 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+    commands:
+      - docker pull postgres:10.6-alpine
+  pre_build:
+    commands:
+      - echo Running postgres container
+      - docker run --rm --name postgres_database -p 5432:5432 -e POSTGRES_PASSWORD=mypassword -d postgres:10.6-alpine
+  build:
+    commands:
+      - echo Install test dependencies
+      - pip install -r requirements.txt
+      - pip install -r requirements-test.txt
+      - echo Run tests
+      - pytest tests
+  post_build:
+    commands:
+      - echo Stopping postgres container
+      - docker container stop postgres_database
